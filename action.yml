@@ -18,6 +18,14 @@ inputs:
     required: false
     description: "The port to open up on the AWS Security group in order to communicate with nomad"
     default: '4646'
+  nomad_namespace:
+    required: false
+    description: "The namespace of the nomad job you are updating"
+    default: "default"
+  nomad_region:
+    required: false
+    description: "The region of the nomad job you are updating"
+    default: "global"
   nomad_version:
     required: false
     description: "The version of nomad that is running on your servers"
