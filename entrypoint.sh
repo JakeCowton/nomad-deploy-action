@@ -25,5 +25,6 @@ curl -L "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" -o 
 
 GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
-./nomad job inspect $INPUT_JOB_NAME | ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$INPUT_IMAGE_FULL_NAME\"" | curl -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
+NOMAD_ADDR="${INPUT_NOMAD_ADDR}"
+./nomad job inspect $INPUT_JOB_NAME | ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$INPUT_IMAGE_FULL_NAME\"" | curl -X POST -H "Content-Type: application/json" --data-binary @- $NOMAD_ADDR/v1/jobs
 
