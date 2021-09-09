@@ -2,7 +2,7 @@ name: Nomad Direct Deploy
 description: Deploys a codebase to Nomad without a Nomad File
 author: Mark Armendariz
 runs:
-  using: node16
+  using: node12
   main: main.js
 inputs:
   job_name:
