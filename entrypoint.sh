@@ -6,7 +6,7 @@ readonly PUBLIC_IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
 
 _changeSecurityGroupRule() {
     aws \
-        --region "${AWS_REGION:-us-east-2}" \
+        --region "${AWS_REGION:-us-east-1}" \
         ec2 "$1-security-group-ingress" \
         --group-id "$AWS_SECURITY_GROUP" \
         --protocol tcp \
@@ -19,16 +19,13 @@ if [ -n "${AWS_SECURITY_GROUP:-}" ]; then
     trap "_changeSecurityGroupRule revoke" INT TERM EXIT
 fi
 
-USE_LEVANT="${USE_LEVANT:-false}"
-if [ "$USE_LEVANT" = "true" ]; then
-  LEVANT_PROMOTE_TIME="${LEVANT_PROMOTE_TIME:-45}"
-  LEVANT_VERSION="${LEVANT_VERSION:-0.2.8}"
-  curl -L https://github.com/hashicorp/levant/releases/download/"$LEVANT_VERSION"/linux-amd64-levant -o levant && \
-    chmod +x ./levant
-  ./levant deploy -ignore-no-changes -address="$NOMAD_ADDR" -canary-auto-promote="$LEVANT_PROMOTE_TIME" -var version="$DOCKER_TAG" "$NOMAD_JOB"
-else
-  NOMAD_VERSION="${NOMAD_VERSION:-1.1.1}"
-  curl -L "https://releases.hashicorp.com/nomad/$NOMAD_VERSION/nomad_${NOMAD_VERSION}_linux_amd64.zip" -o nomad.zip && \
-    unzip nomad.zip
-  sed "s/\[\[\.version\]\]/$DOCKER_TAG/" "$GITHUB_WORKSPACE/$NOMAD_JOB" | ./nomad job run -hcl1 -
-fi
+NOMAD_VERSION="${NOMAD_VERSION:-1.1.4}"
+curl -L "https://releases.hashicorp.com/nomad/$NOMAD_VERSION/nomad_${NOMAD_VERSION}_linux_amd64.zip" -o nomad.zip &&  unzip nomad.zip
+curl -L "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" -o jq && chmod +x jq
+
+JOB_NAME=bot
+TASK_INDEX="${TASK_INDEX:-0}"
+ECR_URI=257779808675.dkr.ecr.us-east-1.amazonaws.com/api/bot:
+DOCKER_TAG=main-081d008
+./nomad job inspect $JOB_NAME | ./jq -r ".Job.TaskGroups[0].Tasks[$TASK_INDEX].Config.image=\"$ECR_URI$DOCKER_TAG\"" | curl -X POST -H "Content-Type: application/json" --data-binary @- $NOMAD_ADDR/v1/jobs
+
