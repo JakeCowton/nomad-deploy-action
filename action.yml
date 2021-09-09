@@ -1,9 +1,35 @@
 name: Nomad Direct Deploy
-description: Deploys a codebase to Nomad
+description: Deploys a codebase to Nomad without a Nomad File
 author: Mark Armendariz
 runs:
   using: node16
   main: main.js
+inputs:
+  job_name:
+    required: true
+    description: "The nomad job name"
+  image_full_name:
+    required: true
+    description: "Full name of the Docker image with registry prefix and tag suffix"
+  nomad_addr:
+    required: true
+    description: "The full uri to the nomad API on your servers, including the port"
+  sg_nomad_port:
+    required: false
+    description: "The port to open up on the AWS Security group in order to communicate with nomad"
+    default: '4646'
+  nomad_version:
+    required: false
+    description: "The version of nomad that is running on your servers"
+    default: "1.1.4"
+  group_index:
+    required: false
+    description: "The nomad job group index (0-based) for the group in which the task that is being replaced resides.  Based upon the order it shows up in the nomad file"
+    default: '0'
+  task_index:
+    required: false
+    description: "The nomad job task index (0-based) for the task that is being replaced.  Based upon the order it shows up in the nomad file"
+    default: '0'
 branding:
   icon: upload-cloud
   color: green
