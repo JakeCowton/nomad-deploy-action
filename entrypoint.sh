@@ -26,6 +26,7 @@ curl -L "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" -o 
 GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
+# Test output
 ./nomad job inspect \
     -tls-skip-verify \
     -address=$INPUT_NOMAD_ADDR \
