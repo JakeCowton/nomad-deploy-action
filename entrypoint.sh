@@ -22,8 +22,8 @@ fi
 if [ ! -f ./nomad ]
 then
     NOMAD_VERSION="${INPUT_NOMAD_VERSION:-1.1.4}"
-    curl -L "https://releases.hashicorp.com/nomad/$NOMAD_VERSION/nomad_${NOMAD_VERSION}_linux_amd64.zip" -o nomad.zip && unzip nomad.zip
-    curl -L "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" -o jq && chmod +x jq
+    curl -sL "https://releases.hashicorp.com/nomad/$NOMAD_VERSION/nomad_${NOMAD_VERSION}_linux_amd64.zip" -o nomad.zip && unzip nomad.zip
+    curl -sL "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" -o jq && chmod +x jq
 fi
 
 IMAGE_FULL_NAME="${INPUT_IMAGE_NAME}:${INPUT_IMAGE_TAG}"
@@ -36,7 +36,7 @@ TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
 if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
   # Update image and label
-  
+
   ./nomad job inspect \
       -tls-skip-verify \
       -address=$INPUT_NOMAD_ADDR \
@@ -45,7 +45,7 @@ if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
       | \
       ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\" | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"" \
       | \
-      curl -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
+      curl -s -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
 else
   # Update Image
 
@@ -57,5 +57,5 @@ else
       | \
       ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\"" \
       | \
-      curl -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
+      curl -s -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
 fi
