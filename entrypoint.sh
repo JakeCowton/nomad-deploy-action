@@ -19,9 +19,12 @@ if [ -n "${AWS_SECURITY_GROUP:-}" ]; then
     trap "_changeSecurityGroupRule revoke" INT TERM EXIT
 fi
 
-NOMAD_VERSION="${INPUT_NOMAD_VERSION:-1.1.4}"
-curl -L "https://releases.hashicorp.com/nomad/$NOMAD_VERSION/nomad_${NOMAD_VERSION}_linux_amd64.zip" -o nomad.zip && unzip nomad.zip
-curl -L "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" -o jq && chmod +x jq
+if [ ! -f ./nomad ]
+then
+    NOMAD_VERSION="${INPUT_NOMAD_VERSION:-1.1.4}"
+    curl -L "https://releases.hashicorp.com/nomad/$NOMAD_VERSION/nomad_${NOMAD_VERSION}_linux_amd64.zip" -o nomad.zip && unzip nomad.zip
+    curl -L "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" -o jq && chmod +x jq
+fi
 
 GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
