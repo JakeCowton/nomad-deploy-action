@@ -34,14 +34,10 @@ GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 # shellcheck disable=SC2034
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
-# shellcheck disable=SC2125
-# shellcheck disable=SC2089
-UPDATES=\'.Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image="$IMAGE_FULL_NAME"\'
+UPDATES=".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\""
 
 if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
-    # shellcheck disable=SC2036
-    # shellcheck disable=SC2211
-    UPDATES=${UPDATES} | \'.Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0]["INPUT_NOMAD_TAG_LABEL"]="$INPUT_IMAGE_TAG"\'
+    UPDATES="${UPDATES} | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\""
 fi
 
 # shellcheck disable=SC2090
