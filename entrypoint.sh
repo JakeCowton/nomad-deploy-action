@@ -37,7 +37,7 @@ TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 UPDATES=".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\""
 
 if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
-    UPDATES="${UPDATES} | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\""
+    UPDATES="'${UPDATES} | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"'"
 fi
 
 # shellcheck disable=SC2090
