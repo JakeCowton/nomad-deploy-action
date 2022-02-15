@@ -26,17 +26,32 @@ then
     curl -L "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" -o jq && chmod +x jq
 fi
 
+IMAGE_FULL_NAME="${INPUT_IMAGE_NAME}:${INPUT_IMAGE_TAG}"
+
+# shellcheck disable=SC2034
 GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
+
+# shellcheck disable=SC2034
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
+# shellcheck disable=SC2125
+# shellcheck disable=SC2089
+UPDATES=\'.Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image="$IMAGE_FULL_NAME"\'
+
+if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
+    # shellcheck disable=SC2036
+    # shellcheck disable=SC2211
+    UPDATES=${UPDATES} | \'.Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0]["INPUT_NOMAD_TAG_LABEL"]="$INPUT_IMAGE_TAG"\'
+fi
+
+# shellcheck disable=SC2090
 ./nomad job inspect \
     -tls-skip-verify \
     -address=$INPUT_NOMAD_ADDR \
     -namespace=$INPUT_NOMAD_NAMESPACE \
     -region=$INPUT_NOMAD_REGION $INPUT_JOB_NAME \
     | \
-    ./jq -r \
-    ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$INPUT_IMAGE_FULL_NAME\"" \
+    ./jq -r $UPDATES \
     | \
     curl -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
 

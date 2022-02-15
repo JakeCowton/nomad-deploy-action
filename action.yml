@@ -8,9 +8,12 @@ inputs:
   job_name:
     required: true
     description: "The nomad job name"
-  image_full_name:
+  image_name:
     required: true
-    description: "Full name of the Docker image with registry prefix and tag suffix"
+    description: "Full name of the Docker image with registry prefix"
+  image_tag:
+    required: true
+    description: "Full name of the Docker image tag suffix"
   nomad_addr:
     required: true
     description: "The full uri to the nomad API on your servers, including the port"
@@ -30,6 +33,10 @@ inputs:
     required: false
     description: "The version of nomad that is running on your servers"
     default: "1.1.4"
+  nomad_tag_label:
+    required: false
+    description: "The name of a label that needs the updated docker tag suffix"
+    default: ""
   group_index:
     required: false
     description: "The nomad job group index (0-based) for the group in which the task that is being replaced resides.  Based upon the order it shows up in the nomad file"

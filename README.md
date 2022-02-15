@@ -17,12 +17,14 @@ This repo will inspect an existing nomad job, replace the image uri with the new
 | Variable          | Details                                                                                                                                                 | Default    |
 |-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
 | `job_name`        | The nomad job name                                                                                                                                      | _Required_ |
-| `image_full_name` | Full name of the Docker image with registry prefix and tag suffix                                                                                       | _Required_ |
+| `image_name`      | Full name of the Docker image with registry prefix                                                                                                      | _Required_ |
+| `image_tag`       | Full name of the Docker image tag suffix                                                                                                                | _Required_ |
 | `nomad_addr`      | The full uri to the nomad API on your servers, including the port                                                                                       | _Required_ |
 | `sg_nomad_port`   | The port to open up on the AWS Security group in order to communicate with nomad                                                                        | 4646       |
 | `nomad_namespace` | The namespace of the nomad job you are updating                                                                                                         | "default"  |
 | `nomad_region`    | The region of the nomad job you are updating                                                                                                            | "global"   |
 | `nomad_version`   | The version of nomad that is running on your servers                                                                                                    | "1.1.4"    |
+| `nomad_tag_label` | The name of a label that needs the updated docker tag suffix                                                                                            | ""         |
 | `group_index`     | The nomad job group index (0-based) for the group in which the task that is being replaced resides.  Based upon the order it shows up in the nomad file | 0          |
 | `task_index`      | The nomad job task index (0-based) for the task that is being replaced.  Based upon the order it shows up in the nomad file                             | 0          |
 
