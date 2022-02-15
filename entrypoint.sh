@@ -34,20 +34,28 @@ GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 # shellcheck disable=SC2034
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
-UPDATES=".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\""
-
 if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
-    UPDATES="'${UPDATES} | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"'"
+  # Update image and label
+  
+  ./nomad job inspect \
+      -tls-skip-verify \
+      -address=$INPUT_NOMAD_ADDR \
+      -namespace=$INPUT_NOMAD_NAMESPACE \
+      -region=$INPUT_NOMAD_REGION $INPUT_JOB_NAME \
+      | \
+      ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\" | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"" \
+      | \
+      curl -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
+else
+  # Update Image
+
+  ./nomad job inspect \
+      -tls-skip-verify \
+      -address=$INPUT_NOMAD_ADDR \
+      -namespace=$INPUT_NOMAD_NAMESPACE \
+      -region=$INPUT_NOMAD_REGION $INPUT_JOB_NAME \
+      | \
+      ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\"" \
+      | \
+      curl -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
 fi
-
-# shellcheck disable=SC2090
-./nomad job inspect \
-    -tls-skip-verify \
-    -address=$INPUT_NOMAD_ADDR \
-    -namespace=$INPUT_NOMAD_NAMESPACE \
-    -region=$INPUT_NOMAD_REGION $INPUT_JOB_NAME \
-    | \
-    ./jq -r $UPDATES \
-    | \
-    curl -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
-
