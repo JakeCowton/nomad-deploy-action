@@ -1,13 +1,13 @@
 name: Nomad Direct Deploy
-description: Deploys a codebase to Nomad without a Nomad File
-author: Mark Armendariz
+description: Deploys a codebase to multiple Nomad jobs without a Nomad File
+author: Jake Cowton
 runs:
   using: node12
   main: main.js
 inputs:
-  job_name:
+  job_name_prefix:
     required: true
-    description: "The nomad job name"
+    description: "The nomad job name prefix"
   image_name:
     required: true
     description: "Full name of the Docker image with registry prefix"
