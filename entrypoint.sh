@@ -43,7 +43,7 @@ _updateImageAndLabel() {
         -tls-skip-verify \
         -address=$INPUT_NOMAD_ADDR \
         -namespace=$INPUT_NOMAD_NAMESPACE \
-        -region=$INPUT_NOMAD_REGION $INPUT_JOB_NAME \
+        -region=$INPUT_NOMAD_REGION $JOB_NAME \
         | \
         ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\" | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"" \
         | \
@@ -63,7 +63,10 @@ _updateImageAndLabel() {
     fi
 }
 
-./nomad job status --namespace $INPUT_NOMAD_NAMESPACE | \
+./nomad job status \
+        -namespace=$INPUT_NOMAD_NAMESPACE | \
+        -tls-skip-verify \
+        -address=$INPUT_NOMAD_ADDR \
     grep -E "running|pending" | \
     cut -f 1 -d ' ' | \
     grep $INPUT_JOB_NAME_PREFIX | \
