@@ -64,9 +64,9 @@ _updateImageAndLabel() {
 }
 
 ./nomad job status \
-        -namespace=$INPUT_NOMAD_NAMESPACE | \
+        -namespace=$INPUT_NOMAD_NAMESPACE \
         -tls-skip-verify \
-        -address=$INPUT_NOMAD_ADDR \
+        -address=$INPUT_NOMAD_ADDR | \
     grep -E "running|pending" | \
     cut -f 1 -d ' ' | \
     grep $INPUT_JOB_NAME_PREFIX | \
