@@ -73,7 +73,7 @@ export -f _updateImageAndLabel
         -address=$INPUT_NOMAD_ADDR \
         -namespace=$INPUT_NOMAD_NAMESPACE \
         -region=$INPUT_NOMAD_REGION | \
+    grep $INPUT_JOB_NAME_PREFIX | \
     grep -E "running|pending" | \
     cut -f 1 -d ' ' | \
-    grep $INPUT_JOB_NAME_PREFIX | \
     xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
