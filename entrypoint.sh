@@ -63,7 +63,7 @@ _updateImageAndLabel() {
 }
 
 export -f _updateImageAndLabel
-export -f IMAGE_FULL_NAME
+export IMAGE_FULL_NAME
 
 ./nomad job status \
         -tls-skip-verify \
