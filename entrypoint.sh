@@ -35,29 +35,26 @@ GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
 _updateImageAndLabel() {
-    JOB_NAME = ${1}
     if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
         # Update image and label
-
         ./nomad job inspect \
             -tls-skip-verify \
             -address=$INPUT_NOMAD_ADDR \
             -namespace=$INPUT_NOMAD_NAMESPACE \
             -region=$INPUT_NOMAD_REGION \
-            $JOB_NAME \
+            $1 \
             | \
             ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\" | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"" \
             | \
             curl -s -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
     else
         # Update Image
-
         ./nomad job inspect \
             -tls-skip-verify \
             -address=$INPUT_NOMAD_ADDR \
             -namespace=$INPUT_NOMAD_NAMESPACE \
             -region=$INPUT_NOMAD_REGION \
-            $JOB_NAME \
+            $1 \
             | \
             ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\"" \
             | \
