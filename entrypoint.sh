@@ -65,6 +65,8 @@ _updateImageAndLabel() {
     fi
 }
 
+export -f _updateImageAndLabel
+
 ./nomad job status \
         -tls-skip-verify \
         -address=$INPUT_NOMAD_ADDR \
