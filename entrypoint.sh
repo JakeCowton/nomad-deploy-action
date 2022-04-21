@@ -68,12 +68,18 @@ _updateImageAndLabel() {
 
 export -f _updateImageAndLabel
 
-./nomad job status \
+response=$(./nomad job status \
         -tls-skip-verify \
         -address=$INPUT_NOMAD_ADDR \
         -namespace=$INPUT_NOMAD_NAMESPACE \
-        -region=$INPUT_NOMAD_REGION | \
+        -region=$INPUT_NOMAD_REGION |\
     grep $INPUT_JOB_NAME_PREFIX | \
     grep -E "running|pending" | \
-    cut -f 1 -d ' ' | \
-    xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
+    cut -f 1 -d ' ')
+
+if "$response" == ""; then
+    echo 'No jobs'
+else
+    echo response | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
+fi
+# xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
