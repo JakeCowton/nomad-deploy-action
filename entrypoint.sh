@@ -75,4 +75,4 @@ export -f _updateImageAndLabel
     grep -E "running|pending" | \
     cut -f 1 -d ' ' | \
     grep $INPUT_JOB_NAME_PREFIX | \
-    xargs -n 1 _updateImageAndLabel
+    xargs -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
