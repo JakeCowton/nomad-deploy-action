@@ -39,9 +39,7 @@ export TASK_INDEX
 export IMAGE_FULL_NAME
 
 _updateImageAndLabel() {
-    if [ -n "$1" ]; then
-        echo "No jobs found"
-    elif [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
+    if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
         # Update image and label
         ./nomad job inspect \
             -tls-skip-verify \
