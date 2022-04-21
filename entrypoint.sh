@@ -39,6 +39,7 @@ export TASK_INDEX
 export IMAGE_FULL_NAME
 
 _updateImageAndLabel() {
+    echo "Updating image for $1"
     if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
         # Update image and label
         ./nomad job inspect \
@@ -77,9 +78,12 @@ response=$(./nomad job status \
     grep -E "running|pending" | \
     cut -f 1 -d ' ')
 
+echo "Jobs found $response"
+
 if "$response" == ""; then
     echo 'No jobs'
 else
+    echo "Updating images"
     echo response | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
 fi
 # xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
