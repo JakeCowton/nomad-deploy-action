@@ -16,7 +16,7 @@ This repo will inspect an existing nomad job, replace the image uri with the new
 
 | Variable          | Details                                                                                                                                                 | Default    |
 |-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `job_name`        | The nomad job name                                                                                                                                      | _Required_ |
+| `job_name_prefix` | The prefix for nomad jobs to update                                                                                                                     | _Required_ |
 | `image_name`      | Full name of the Docker image with registry prefix                                                                                                      | _Required_ |
 | `image_tag`       | Full name of the Docker image tag suffix                                                                                                                | _Required_ |
 | `nomad_addr`      | The full uri to the nomad API on your servers, including the port                                                                                       | _Required_ |
