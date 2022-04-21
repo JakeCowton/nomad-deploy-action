@@ -34,6 +34,10 @@ GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 # shellcheck disable=SC2034
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
+export GROUP_INDEX
+export TASK_INDEX
+export IMAGE_FULL_NAME
+
 _updateImageAndLabel() {
     if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
         # Update image and label
@@ -44,7 +48,7 @@ _updateImageAndLabel() {
             -region=$INPUT_NOMAD_REGION \
             $1 \
             | \
-            ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$2\" | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"" \
+            ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\" | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"" \
             | \
             curl -s -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
     else
@@ -56,14 +60,13 @@ _updateImageAndLabel() {
             -region=$INPUT_NOMAD_REGION \
             $1 \
             | \
-            ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$2\"" \
+            ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\"" \
             | \
             curl -s -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
     fi
 }
 
 export -f _updateImageAndLabel
-export IMAGE_FULL_NAME
 
 ./nomad job status \
         -tls-skip-verify \
@@ -73,4 +76,4 @@ export IMAGE_FULL_NAME
     grep -E "running|pending" | \
     cut -f 1 -d ' ' | \
     grep $INPUT_JOB_NAME_PREFIX | \
-    xargs -I {} -n 1 bash -c '_updateImageAndLabel "$1 $IMAGE_FULL_NAME"' _ {}
+    xargs -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
