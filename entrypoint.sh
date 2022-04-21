@@ -35,8 +35,6 @@ GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
 _updateImageAndLabel() {
-    echo 'Updating image for job $1 to $2'
-
     if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
         # Update image and label
         ./nomad job inspect \
@@ -65,6 +63,7 @@ _updateImageAndLabel() {
 }
 
 export -f _updateImageAndLabel
+export -f IMAGE_FULL_NAME
 
 ./nomad job status \
         -tls-skip-verify \
@@ -74,4 +73,4 @@ export -f _updateImageAndLabel
     grep -E "running|pending" | \
     cut -f 1 -d ' ' | \
     grep $INPUT_JOB_NAME_PREFIX | \
-    xargs -I {} -n 1 bash -c '_updateImageAndLabel "$@ $IMAGE_FULL_NAME"' _ {}
+    xargs -I {} -n 1 bash -c '_updateImageAndLabel "$1 $IMAGE_FULL_NAME"' _ {}
