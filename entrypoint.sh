@@ -68,19 +68,20 @@ _updateImageAndLabel() {
 
 export -f _updateImageAndLabel
 
-job_list = $(./nomad job status \
+JOB_LIST=$(./nomad job status \
             -tls-skip-verify \
             -address=$INPUT_NOMAD_ADDR \
             -namespace=$INPUT_NOMAD_NAMESPACE \
             -region=$INPUT_NOMAD_REGION)
+NO_JOB_STR="No running jobs"
 
-if "$job_list" == "No running jobs"; then
+if [ "$JOB_LIST" = "$NO_JOB_STR" ]; then
     exit 0
 fi
 
-jobs_with_prefixes = echo "$job_list" | grep $INPUT_JOB_NAME_PREFIX
-running_jobs = echo "$jobs_with_prefixes" | grep -E "running|pending"
-job_names = echo "$running_jobs" | cut -f 1 -d ' '
+jobs_with_prefixes=echo "$JOB_LIST" | grep $INPUT_JOB_NAME_PREFIX
+running_jobs=echo "$jobs_with_prefixes" | grep -E "running|pending"
+job_names=echo "$running_jobs" | cut -f 1 -d ' '
 
 echo "Jobs found $job_names"
 echo "$job_names" | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
