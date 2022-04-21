@@ -35,6 +35,8 @@ GROUP_INDEX="${INPUT_GROUP_INDEX:-0}"
 TASK_INDEX="${INPUT_TASK_INDEX:-0}"
 
 _updateImageAndLabel() {
+    echo 'Updating image for job $1 to $2'
+
     if [ -n "${INPUT_NOMAD_TAG_LABEL:-}" ]; then
         # Update image and label
         ./nomad job inspect \
@@ -44,7 +46,7 @@ _updateImageAndLabel() {
             -region=$INPUT_NOMAD_REGION \
             $1 \
             | \
-            ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\" | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"" \
+            ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$2\" | .Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.labels[0][\"$INPUT_NOMAD_TAG_LABEL\"]=\"$INPUT_IMAGE_TAG\"" \
             | \
             curl -s -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
     else
@@ -56,7 +58,7 @@ _updateImageAndLabel() {
             -region=$INPUT_NOMAD_REGION \
             $1 \
             | \
-            ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$IMAGE_FULL_NAME\"" \
+            ./jq -r ".Job.TaskGroups[$GROUP_INDEX].Tasks[$TASK_INDEX].Config.image=\"$2\"" \
             | \
             curl -s -X POST -H "Content-Type: application/json" --data-binary @- $INPUT_NOMAD_ADDR/v1/jobs
     fi
@@ -72,4 +74,4 @@ export -f _updateImageAndLabel
     grep -E "running|pending" | \
     cut -f 1 -d ' ' | \
     grep $INPUT_JOB_NAME_PREFIX | \
-    xargs -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
+    xargs -I {} -n 1 bash -c '_updateImageAndLabel "$@ $IMAGE_FULL_NAME"' _ {}
