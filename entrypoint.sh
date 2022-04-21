@@ -84,6 +84,5 @@ if "$response" == ""; then
     echo 'No jobs'
 else
     echo "Updating images"
-    echo response | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
+    echo "$response" | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
 fi
-# xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
