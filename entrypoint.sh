@@ -74,7 +74,7 @@ job_list = $(./nomad job status \
             -namespace=$INPUT_NOMAD_NAMESPACE \
             -region=$INPUT_NOMAD_REGION)
 
-if "$response" == ""; then
+if "$job_list" == "No running jobs"; then
     exit 0
 fi
 
