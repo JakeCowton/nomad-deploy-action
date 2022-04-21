@@ -76,4 +76,4 @@ export -f _updateImageAndLabel
     grep -E "running|pending" | \
     cut -f 1 -d ' ' | \
     grep $INPUT_JOB_NAME_PREFIX | \
-    xargs -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
+    xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
