@@ -107,10 +107,11 @@ if [ "$RUNNING_JOBS" = "$NO_RUNNING_JOBS_WITH_PREFIXES_STR" ]; then
     exit 0
 else
     echo "There are running jobs with prefix\n"
+
+    JOB_NAMES=$(echo "$RUNNING_JOBS" | cut -f 1 -d ' ')
+
+    echo "Jobs found $JOB_NAMES"
+    echo "$JOB_NAMES" | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
+    exit 0
 fi
-
-JOB_NAMES=$(echo "$RUNNING_JOBS" | cut -f 1 -d ' ')
-
-echo "Jobs found $JOB_NAMES"
-echo "$JOB_NAMES" | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
 exit 0
