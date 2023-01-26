@@ -73,16 +73,31 @@ JOB_LIST=$(./nomad job status \
             -address=$INPUT_NOMAD_ADDR \
             -namespace=$INPUT_NOMAD_NAMESPACE \
             -region=$INPUT_NOMAD_REGION)
+# Check for no running jobs
 NO_JOB_STR="No running jobs"
 
 if [ "$JOB_LIST" = "$NO_JOB_STR" ]; then
     exit 0
 fi
 
-jobs_with_prefixes=$(echo "$JOB_LIST" | grep $INPUT_JOB_NAME_PREFIX)
-running_jobs=$(echo "$jobs_with_prefixes" | grep -E "running|pending")
-job_names=$(echo "$running_jobs" | cut -f 1 -d ' ')
+# Check for no jobs with prefix
+JOBS_WITH_PREFIXES=$(echo "$JOB_LIST" | grep $INPUT_JOB_NAME_PREFIX)
+NO_JOBS_WITH_PREFIXES_STR=""
 
-echo "Jobs found $job_names"
-echo "$job_names" | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
+if [ "$JOBS_WITH_PREFIXES" = "$NO_JOBS_WITH_PREFIXES_STR" ]; then
+    exit 0
+fi
+
+# Check for no running jobs with prefix
+RUNNING_JOBS=$(echo "$JOBS_WITH_PREFIXES" | grep -E "running|pending")
+NO_RUNNING_JOBS_WITH_PREFIXES_STR=""
+
+if [ "$RUNNING_JOBS" = "$NO_RUNNING_JOBS_WITH_PREFIXES_STR" ]; then
+    exit 0
+fi
+
+JOB_NAMES=$(echo "$RUNNING_JOBS" | cut -f 1 -d ' ')
+
+echo "Jobs found $JOB_NAMES"
+echo "$JOB_NAMES" | xargs --no-run-if-empty -I {} -n 1 bash -c '_updateImageAndLabel "$@"' _ {}
 exit 0
