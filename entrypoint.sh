@@ -73,27 +73,40 @@ JOB_LIST=$(./nomad job status \
             -address=$INPUT_NOMAD_ADDR \
             -namespace=$INPUT_NOMAD_NAMESPACE \
             -region=$INPUT_NOMAD_REGION)
+
 # Check for no running jobs
 NO_JOB_STR="No running jobs"
+echo "JOB LIST:\n$JOB_LIST\n"
 
 if [ "$JOB_LIST" = "$NO_JOB_STR" ]; then
+    echo "There are no jobs, exiting\n"
     exit 0
+else
+    echo "There are jobs in namespace\n"
 fi
 
 # Check for no jobs with prefix
 JOBS_WITH_PREFIXES=$(echo "$JOB_LIST" | grep $INPUT_JOB_NAME_PREFIX)
 NO_JOBS_WITH_PREFIXES_STR=""
+echo "JOBS WITH PREFIXES:\n$JOBS_WITH_PREFIXES\n"
 
 if [ "$JOBS_WITH_PREFIXES" = "$NO_JOBS_WITH_PREFIXES_STR" ]; then
+    echo "There are no jobs with prefix, exiting\n"
     exit 0
+else
+    echo "There are jobs with prefix\n"
 fi
 
 # Check for no running jobs with prefix
 RUNNING_JOBS=$(echo "$JOBS_WITH_PREFIXES" | grep -E "running|pending")
 NO_RUNNING_JOBS_WITH_PREFIXES_STR=""
+echo "RUNNING JOBS:\n$RUNNING_JOBS\n"
 
 if [ "$RUNNING_JOBS" = "$NO_RUNNING_JOBS_WITH_PREFIXES_STR" ]; then
+    echo "There are no running jobs with prefix, exiting\n"
     exit 0
+else
+    echo "There are running jobs with prefix\n"
 fi
 
 JOB_NAMES=$(echo "$RUNNING_JOBS" | cut -f 1 -d ' ')
